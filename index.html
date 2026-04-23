@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Homebuyer Experience — Zillow, Redfin, Realtor.com &amp; Homes.com</title>
+<style>
+  :root {
+    --color-background-primary: #FFFFFF;
+    --color-background-secondary: #F5F4EF;
+    --color-background-success: #EAF3DE;
+    --color-background-danger: #FCEBEB;
+    --color-text-primary: #1A1A18;
+    --color-text-secondary: #6B6B66;
+    --color-text-tertiary: #9B9B96;
+    --color-border-tertiary: rgba(0, 0, 0, 0.12);
+    --color-border-secondary: rgba(0, 0, 0, 0.22);
+    --color-border-primary: rgba(0, 0, 0, 0.32);
+    --color-border-success: #3B6D11;
+    --color-border-danger: #A32D2D;
+    --color-border-info: #185FA5;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-sans);
+    background: #F0EFE9;
+    color: var(--color-text-primary);
+    padding: 24px;
+    min-height: 100vh;
+  }
+
+  .page-wrap {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  .scroll-outer {
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    background: var(--color-background-primary);
+  }
+
+  .scroll-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+    background: var(--color-background-secondary);
+  }
+
+  .scroll-title-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+  }
+
+  .scroll-hint {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+  }
+
+  .scroll-area {
+    height: 600px;
+    overflow-y: auto;
+    padding: 8px 12px 12px;
+    background: var(--color-background-primary);
+  }
+
+  .scroll-area::-webkit-scrollbar { width: 6px; }
+  .scroll-area::-webkit-scrollbar-track { background: transparent; }
+  .scroll-area::-webkit-scrollbar-thumb { background: var(--color-border-secondary); border-radius: 4px; }
+
+  .matrix {
+    display: grid;
+    grid-template-columns: 90px repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 8px;
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+
+  .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .h-name { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+
+  .explainer {
+    grid-column: 2 / -1;
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    padding: 12px 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-text-primary);
+  }
+
+  .endgame {
+    grid-column: 2 / -1;
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    padding: 16px 16px 14px;
+  }
+
+  .endgame-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 10px; }
+  .endgame-body { font-size: 13px; line-height: 1.6; color: var(--color-text-primary); }
+  .endgame-body p { margin: 0 0 10px; }
+  .endgame-body p:last-child { margin-bottom: 0; }
+  .endgame-divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 14px 0; }
+  .endgame-sub { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); margin: 0 0 10px; }
+
+  .row-label {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 4px;
+    line-height: 1.3;
+  }
+
+  .step {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-md);
+    padding: 10px 12px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--color-text-primary);
+  }
+
+  .step ul { margin: 6px 0 0; padding-left: 16px; }
+  .step ul li { margin-bottom: 3px; }
+  .step p { margin: 0 0 8px; }
+  .step p:last-child { margin-bottom: 0; }
+
+  .arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 0;
+  }
+
+  .pro { border-color: var(--color-border-success); background: var(--color-background-success); }
+  .con { border-color: var(--color-border-danger); background: var(--color-background-danger); }
+
+  @media (max-width: 760px) {
+    body { padding: 12px; }
+    .matrix { grid-template-columns: 70px repeat(4, 1fr); gap: 6px; }
+    .row-label { font-size: 11px; }
+    .header { padding: 10px 6px; }
+    .h-name { font-size: 12px; }
+    .step { padding: 8px 10px; font-size: 11.5px; }
+    .explainer, .endgame-body { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+<h1 class="sr-only">AI Homebuyer Experience — Zillow, Redfin, Realtor.com &amp; Homes.com</h1>
+
+<div class="scroll-outer">
+  <div class="scroll-top">
+    <span class="scroll-title-text">AI homebuyer experience — Zillow, Redfin, Realtor.com &amp; Homes.com</span>
+    <span class="scroll-hint">Scroll to explore ↓</span>
+  </div>
+  <div class="scroll-area">
+    <div class="matrix">
+
+      <div></div>
+      <div class="header"><span class="dot" style="background:#006AFF;"></span><span class="h-name">Zillow</span></div>
+      <div class="header"><span class="dot" style="background:#A02021;"></span><span class="h-name">Redfin</span></div>
+      <div class="header"><span class="dot" style="background:#D92228;"></span><span class="h-name">Realtor.com</span></div>
+      <div class="header"><span class="dot" style="background:#EF8C37;"></span><span class="h-name">Homes.com</span></div>
+
+      <div></div>
+      <div class="explainer">The industry's leading portals have spent the past six months launching apps within ChatGPT. To get started with any of the apps, homebuyers must connect them to their ChatGPT account. And when they're ready to search listings, they must choose the specific app they want data from by clicking the plus sign in the 'Ask Anything' box.</div>
+
+      <div class="row-label">Getting curious with ChatGPT</div>
+      <div class="step">"Show me listings in Austin with 3 bedrooms and 2 bathrooms that are under $1M, and near outdoor amenities, like running trails."</div>
+      <div class="step">"I'd like to see the top neighborhoods in Seattle. Bonus points if they're family-friendly."</div>
+      <div class="step">"Can I afford a home near downtown Chicago? Can you compare renting and buying?"</div>
+      <div></div>
+
+      <div></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#006AFF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#A02021" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#D92228" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div></div>
+
+      <div></div>
+      <div class="step">Buyers will see a map of listings that match the search criteria, with a scrollable banner displaying a hero image, asking price, address, and other key information.</div>
+      <div class="step">No map, yet. Instead, buyers will receive a list of neighborhoods and a sentence or two about what makes the neighborhood great for families.</div>
+      <div class="step">The affordability question toggles Realtor.com's affordability calculator. Buyers can adjust their income, down payment, and monthly debt to see which listings fit their budget. They'll also get a side-by-side comparison of buying and renting.</div>
+      <div></div>
+
+      <div></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#006AFF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#A02021" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#D92228" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div></div>
+
+      <div class="row-label">Getting refined</div>
+      <div class="step" style="grid-column:span 4;">After the initial results, homebuyers are prompted to answer follow-up questions relevant to their search, whether that means sharing additional listing or neighborhood preferences or providing more specific information about their budget.<br><br>The buyer guides the conversation and how it unfolds; however, there are some questions the app may not be able to answer, depending on how a buyer asks them.<br><br>For example, if a buyer asks about a large backyard and the listings don't include that specific information, ChatGPT will redirect them to ask about lot size, which provides context about how big a backyard might be.<br><br>These apps are a good starting point for homebuyers, but they can feel stilted for homebuyers on the free tier, which limits usage.</div>
+
+      <div></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#006AFF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#A02021" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#D92228" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div></div>
+
+      <div class="row-label">The handoff</div>
+      <div class="step">Buyers can schedule a tour or contact a Zillow Premier agent without leaving ChatGPT. Or they can go to Zillow's homepage to continue their search.</div>
+      <div class="step">Buyers are redirected to Redfin to view full listing details, schedule tours, or contact an agent.</div>
+      <div class="step">Buyers are redirected to Realtor.com to view full listing details, schedule tours, or contact an agent.</div>
+      <div></div>
+
+      <div></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#006AFF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#A02021" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#D92228" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div></div>
+
+      <div class="row-label">Additional insights</div>
+      <div class="step">Zillow launched its app in October 2025. Some industry members raised concerns about potential IDX violations, but the portal said OpenAI isn't given "a feed of MLS data."</div>
+      <div class="step">Redfin launched its app in February, three months after launching conversational search capabilities on Redfin.com.</div>
+      <div class="step">Realtor.com launched its app in March. The listing data is provided through direct MLS partnerships rather than IDX. Like other portals, it bans AI training.</div>
+      <div class="step">The CoStar-owned portal hasn't launched a ChatGPT app as of April.</div>
+
+      <div></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#006AFF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#A02021" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#D92228" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#EF8C37" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <div></div>
+      <div class="explainer">Each portal's ChatGPT app is designed to be a starting point — but the ultimate goal is moving them back toward their main platforms, where AI-powered natural language search is fueling a more intuitive home search process where buyers can deep-dive into market, individual listing, affordability, and mortgage insights.</div>
+
+      <div></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#006AFF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#A02021" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#D92228" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#EF8C37" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <div class="row-label">AI home search</div>
+      <div class="step"><p>Zillow's AI mode allows buyers to:</p><ul><li>Search listings</li><li>Estimate renovation costs</li><li>Get context on pricing trends and cuts</li><li>Request advice on making a competitive offer</li><li>Calculate affordability using BuyAbility</li><li>Compare buying vs. renting</li><li>View neighborhood and local market insights</li><li>Schedule tours and connect with an agent</li></ul></div>
+      <div class="step"><p>Redfin AI allows buyers to:</p><ul><li>Search listings</li><li>Get context on pricing trends</li><li>View neighborhood and local market insights</li></ul></div>
+      <div class="step"><p>Realtor.com's AI-powered search allows buyers to:</p><ul><li>Search listings with support for more than 300 automated listing tags</li><li>Overlay search results with Realtor.com's other search features, like Dynamic Maps and FlyAround</li></ul></div>
+      <div class="step"><p>Homes AI allows buyers to:</p><ul><li>Search listings</li><li>View neighborhood and local market insights</li><li>Get context on pricing trends and cuts</li><li>Scroll through listing photos and 3D tours with voice command</li><li>View interior measurements for fixtures, cabinetry, and other features</li><li>Digitally redecorate listings</li><li>Schedule tours and connect with an agent</li></ul></div>
+
+      <div></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#006AFF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#A02021" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#D92228" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#EF8C37" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <div></div>
+      <div class="explainer">Each portal allows buyers to get pretty granular in their search for listings. All of them support the obvious parameters, like price, the number of bedrooms and bathrooms, neighborhood preferences, and proximity to points of interest.<br><br>However, some buyers can get wacky with their requests — in a demo with Redfin, product leaders told Inman a buyer searched for castles. There aren't any on Redfin's site, but the AI assistant found listings with castle-like features, like turrets and spires. "It's able to look at photos and zero in on characteristics," Redfin product manager George Perantatos said.</div>
+
+      <div></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#006AFF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#A02021" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#D92228" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="arrow"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2 V14 M4 10 L9 15 L14 10" stroke="#EF8C37" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <div class="row-label">Highlights</div>
+      <div class="step pro"><p>Zillow's AI mode enables buyers to estimate a wider range of housing costs and get one of the most comprehensive views of what they can afford.</p><p>Thanks to the integration with Zillow's other tools, buyers can do this without leaving their AI-mode conversation — maintaining a more continuous experience.</p></div>
+      <div class="step pro"><p>Sometimes simple is better, and Redfin AI offers a straightforward experience for homebuyers.</p><p>Listings are displayed neatly in the chat, and Redfin AI tends to lean toward giving concise, easy-to-follow answers rather than overwhelming buyers with data.</p></div>
+      <div class="step pro"><p>Realtor.com's AI search focuses on just that — search. There isn't a back-and-forth conversational experience like its ChatGPT app.</p><p>Still, the ability to overlay the portal's other search features, like Dynamic Maps, certainly helps cut through the noise and zero in on the listing they want.</p></div>
+      <div class="step pro"><p>CoStar's proprietary data puts Homes AI at the top of the pack in its ability to provide in-depth market and neighborhood insights.</p><p>The voice search function is a major plus and underscores buyers' attraction to conversational search.</p></div>
+
+      <div class="row-label">Things to consider</div>
+      <div class="step con"><p>AI mode isn't available in all markets, with the portal doing a phased rollout throughout 2026.</p><p>Also, the amount of information Zillow AI mode provides can, at times, be overwhelming.</p></div>
+      <div class="step con"><p>Redfin AI doesn't allow buyers to calculate affordability, make buying vs. renting comparisons, schedule a tour, or connect with an agent via chat.</p><p>Instead, it directs you to its tools outside the chat, which slows the back-and-forth between buyers and the AI assistant.</p></div>
+      <div class="step con"><p>There isn't a back-and-forth conversational experience like the one in its ChatGPT app, which might be a disappointment for buyers who are looking for a continuation of that on Realtor.com's main site.</p></div>
+      <div class="step con"><p>Homes AI prioritizes the voice command feature, which may deter some buyers who prefer a more typical chat experience and aren't sure how to access it.</p><p>However, it's quite simple — just click the Homes AI text box and maximize it to see the chat transcript and type questions.</p></div>
+
+      <div></div>
+      <div class="endgame">
+        <p class="endgame-title">The endgame: What does this mean for agents?</p>
+        <div class="endgame-body">
+          <p>The endgame for each portal is to keep homebuyers within their ecosystem. For Zillow and Redfin, this can strengthen engagement and create more high-intent homebuyers who can become a lead, or qualify for one of their respective lead products.</p>
+          <p>There's a similar potential gain for Realtor.com and Homes.com, with higher-intent buyers being added into Realtor.com's lead system and Homes.com heightening the exposure listing agents get on their site.</p>
+          <p>However, agents operating outside of these portals' ecosystems — an April 2025 Inman Intel survey revealed 70% of agents who've bought leads no longer do — may find that buyers are coming to the table with a clearer understanding of what they want, what they can afford, and the market factors that will impact their buying experience.</p>
+          <hr class="endgame-divider">
+          <p class="endgame-sub">Here's what portal spokespeople had to say about how AI impacts buyer engagement:</p>
+          <p>A Zillow spokesperson told Inman they didn't have any metrics on whether AI mode users request tours or connect with agents faster than non-AI users, since the tool is still in early beta. But they said "signals are encouraging," while noting "users who engage with AI mode before connecting with an agent appear to be more prepared and higher-intent when they make that connection."</p>
+          <p>A Redfin spokesperson said that Redfin AI has doubled metrics such as "time on the website, listing page views, days active, and positive home interactions" for homebuyers using the tool compared to those who do not. About half of Redfin AI conversations have more than three messages, and 10 percent have more than 10 messages.</p>
+          <p>Realtor.com and Homes.com weren't able to share their respective statistics in time for publication.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</body>
+</html>
